@@ -1,0 +1,350 @@
+/* 🎨 ESTILOS DO COMPONENTE DE LOGIN */
+
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.login-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 450px;
+  animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 🏷️ HEADER */
+.login-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.logo-icon {
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.logo h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  color: #718096;
+  font-size: 0.9rem;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* 📝 FORMULÁRIO */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #4a5568;
+  font-size: 0.9rem;
+}
+
+.label-icon {
+  font-size: 1rem;
+}
+
+.form-group input {
+  padding: 15px 20px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #f7fafc;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 🔒 CAMPO DE SENHA */
+.password-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input input {
+  flex: 1;
+  padding-right: 50px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.password-toggle:hover {
+  background-color: #f1f5f9;
+}
+
+.password-toggle:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 🚀 BOTÃO DE LOGIN */
+.login-button {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  padding: 16px 24px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.login-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+.login-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.login-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.login-button.loading {
+  background: linear-gradient(135deg, #a0aec0, #718096);
+}
+
+.button-icon {
+  font-size: 1.1rem;
+}
+
+/* ⏳ SPINNER */
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ⚠️ MENSAGEM DE ERRO */
+.error-message {
+  background: #fed7d7;
+  color: #c53030;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #feb2b2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.error-icon {
+  font-size: 1.1rem;
+}
+
+/* 🔗 FOOTER */
+.login-footer {
+  text-align: center;
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.login-footer p {
+  color: #718096;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.register-link {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.register-link:hover {
+  color: #764ba2;
+  text-decoration: underline;
+}
+
+/* 🛡️ INFORMAÇÕES DE SEGURANÇA */
+.security-info {
+  margin-top: 30px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f0f4f8, #e2e8f0);
+  border-radius: 12px;
+  border: 1px solid #cbd5e0;
+}
+
+.security-info h3 {
+  color: #2d3748;
+  font-size: 1rem;
+  margin: 0 0 15px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.security-info ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.security-info li {
+  color: #4a5568;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 📱 RESPONSIVIDADE */
+@media (max-width: 480px) {
+  .login-container {
+    padding: 10px;
+  }
+  
+  .login-card {
+    padding: 30px 25px;
+  }
+  
+  .logo h1 {
+    font-size: 1.7rem;
+  }
+  
+  .security-info {
+    padding: 15px;
+  }
+  
+  .security-info li {
+    font-size: 0.8rem;
+  }
+}
+
+/* 🌙 MODO ESCURO (OPCIONAL) */
+@media (prefers-color-scheme: dark) {
+  .login-card {
+    background: rgba(26, 32, 44, 0.95);
+    color: #e2e8f0;
+  }
+  
+  .logo h1,
+  .form-group label {
+    color: #e2e8f0;
+  }
+  
+  .subtitle,
+  .login-footer p {
+    color: #a0aec0;
+  }
+  
+  .form-group input {
+    background: #2d3748;
+    border-color: #4a5568;
+    color: #e2e8f0;
+  }
+  
+  .form-group input:focus {
+    background: #1a202c;
+    border-color: #667eea;
+  }
+  
+  .security-info {
+    background: linear-gradient(135deg, #2d3748, #4a5568);
+    border-color: #718096;
+  }
+  
+  .security-info h3,
+  .security-info li {
+    color: #e2e8f0;
+  }
+}

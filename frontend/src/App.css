@@ -1,0 +1,316 @@
+/* 🚀 ESTILOS GLOBAIS DA APLICAÇÃO CHATSECURE */
+
+/* 🔄 RESET E CONFIGURAÇÕES GLOBAIS */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  height: 100%;
+}
+
+.app {
+  height: 100%;
+  background: #f7fafc;
+}
+
+/* ⏳ TELA DE CARREGAMENTO */
+.loading-screen {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.loading-content {
+  text-align: center;
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.loading-content h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 20px 0 10px 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.loading-content p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+/* 🌀 SPINNER GRANDE */
+.spinner-large {
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 🚫 PÁGINA 404 */
+.not-found {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+}
+
+.not-found-content {
+  text-align: center;
+  max-width: 500px;
+  padding: 40px;
+  animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.not-found-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  display: block;
+  opacity: 0.7;
+}
+
+.not-found-content h1 {
+  font-size: 6rem;
+  font-weight: 900;
+  color: #667eea;
+  margin: 0;
+  text-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+}
+
+.not-found-content h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 10px 0 15px 0;
+}
+
+.not-found-content p {
+  font-size: 1.1rem;
+  color: #718096;
+  margin: 0 0 30px 0;
+  line-height: 1.5;
+}
+
+.back-home-button {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.back-home-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+.back-home-button:active {
+  transform: translateY(0);
+}
+
+/* 🎨 UTILITÁRIOS GLOBAIS */
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: 0.25rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-3 { margin-bottom: 0.75rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-5 { margin-bottom: 1.25rem; }
+
+.mt-0 { margin-top: 0; }
+.mt-1 { margin-top: 0.25rem; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-3 { margin-top: 0.75rem; }
+.mt-4 { margin-top: 1rem; }
+.mt-5 { margin-top: 1.25rem; }
+
+.p-0 { padding: 0; }
+.p-1 { padding: 0.25rem; }
+.p-2 { padding: 0.5rem; }
+.p-3 { padding: 0.75rem; }
+.p-4 { padding: 1rem; }
+.p-5 { padding: 1.25rem; }
+
+/* 🔒 CLASSES DE SEGURANÇA */
+.secure-badge {
+  background: linear-gradient(135deg, #48bb78, #38a169);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.encryption-indicator {
+  color: #48bb78;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 📱 RESPONSIVIDADE GLOBAL */
+@media (max-width: 768px) {
+  .loading-content h2 {
+    font-size: 2rem;
+  }
+  
+  .loading-content p {
+    font-size: 1rem;
+  }
+  
+  .spinner-large {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .not-found-content {
+    padding: 30px 20px;
+  }
+  
+  .not-found-content h1 {
+    font-size: 4rem;
+  }
+  
+  .not-found-content h2 {
+    font-size: 1.5rem;
+  }
+  
+  .not-found-content p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .loading-content h2 {
+    font-size: 1.8rem;
+  }
+  
+  .not-found-content h1 {
+    font-size: 3rem;
+  }
+  
+  .not-found-content h2 {
+    font-size: 1.3rem;
+  }
+  
+  .back-home-button {
+    padding: 12px 24px;
+    font-size: 0.9rem;
+  }
+}
+
+/* 🌙 MODO ESCURO (OPCIONAL) */
+@media (prefers-color-scheme: dark) {
+  .app {
+    background: #1a202c;
+    color: #e2e8f0;
+  }
+  
+  .not-found {
+    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+  }
+  
+  .not-found-content h2 {
+    color: #e2e8f0;
+  }
+  
+  .not-found-content p {
+    color: #a0aec0;
+  }
+}
+
+/* 🔧 SCROLLBAR PERSONALIZADA */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #5a67d8, #6b46c1);
+}
+
+/* 🎯 SELEÇÃO DE TEXTO */
+::selection {
+  background: rgba(102, 126, 234, 0.3);
+  color: #2d3748;
+}
+
+::-moz-selection {
+  background: rgba(102, 126, 234, 0.3);
+  color: #2d3748;
+}

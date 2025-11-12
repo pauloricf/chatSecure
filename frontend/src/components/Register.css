@@ -1,0 +1,395 @@
+/* 🎨 ESTILOS DO COMPONENTE DE REGISTRO */
+
+.register-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.register-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px;
+  animation: slideUp 0.6s ease-out;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 🏷️ HEADER */
+.register-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.logo-icon {
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.logo h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  color: #718096;
+  font-size: 0.9rem;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* 📝 FORMULÁRIO */
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #4a5568;
+  font-size: 0.9rem;
+}
+
+.label-icon {
+  font-size: 1rem;
+}
+
+.form-group input {
+  padding: 14px 18px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #f7fafc;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 🔒 CAMPO DE SENHA */
+.password-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input input {
+  flex: 1;
+  padding-right: 50px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.password-toggle:hover {
+  background-color: #f1f5f9;
+}
+
+.password-toggle:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 🚀 BOTÃO DE REGISTRO */
+.register-button {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  padding: 16px 24px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.register-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+.register-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.register-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.register-button.loading {
+  background: linear-gradient(135deg, #a0aec0, #718096);
+}
+
+.button-icon {
+  font-size: 1.1rem;
+}
+
+/* ⏳ SPINNER */
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ⚠️ MENSAGEM DE ERRO */
+.error-message {
+  background: #fed7d7;
+  color: #c53030;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #feb2b2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.error-icon {
+  font-size: 1.1rem;
+}
+
+/* 🔗 FOOTER */
+.register-footer {
+  text-align: center;
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.register-footer p {
+  color: #718096;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.login-link {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.login-link:hover {
+  color: #764ba2;
+  text-decoration: underline;
+}
+
+/* 🔐 PROCESSO DE REGISTRO */
+.registration-process {
+  margin-top: 30px;
+  padding: 25px;
+  background: linear-gradient(135deg, #f0f4f8, #e2e8f0);
+  border-radius: 12px;
+  border: 1px solid #cbd5e0;
+}
+
+.registration-process h3 {
+  color: #2d3748;
+  font-size: 1rem;
+  margin: 0 0 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.process-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+.step-number {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.step-content {
+  flex: 1;
+}
+
+.step-content strong {
+  color: #2d3748;
+  font-size: 0.9rem;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.step-content p {
+  color: #4a5568;
+  font-size: 0.8rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* 📱 RESPONSIVIDADE */
+@media (max-width: 480px) {
+  .register-container {
+    padding: 10px;
+  }
+  
+  .register-card {
+    padding: 30px 25px;
+    max-height: 95vh;
+  }
+  
+  .logo h1 {
+    font-size: 1.7rem;
+  }
+  
+  .registration-process {
+    padding: 20px;
+  }
+  
+  .step {
+    gap: 12px;
+  }
+  
+  .step-number {
+    width: 24px;
+    height: 24px;
+    font-size: 0.7rem;
+  }
+  
+  .step-content strong {
+    font-size: 0.85rem;
+  }
+  
+  .step-content p {
+    font-size: 0.75rem;
+  }
+}
+
+/* 🌙 MODO ESCURO (OPCIONAL) */
+@media (prefers-color-scheme: dark) {
+  .register-card {
+    background: rgba(26, 32, 44, 0.95);
+    color: #e2e8f0;
+  }
+  
+  .logo h1,
+  .form-group label {
+    color: #e2e8f0;
+  }
+  
+  .subtitle,
+  .register-footer p {
+    color: #a0aec0;
+  }
+  
+  .form-group input {
+    background: #2d3748;
+    border-color: #4a5568;
+    color: #e2e8f0;
+  }
+  
+  .form-group input:focus {
+    background: #1a202c;
+    border-color: #667eea;
+  }
+  
+  .registration-process {
+    background: linear-gradient(135deg, #2d3748, #4a5568);
+    border-color: #718096;
+  }
+  
+  .registration-process h3,
+  .step-content strong,
+  .step-content p {
+    color: #e2e8f0;
+  }
+}
