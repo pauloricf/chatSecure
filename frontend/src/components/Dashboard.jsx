@@ -480,6 +480,10 @@ const Dashboard = () => {
         </div>
 
         <div className="header-right">
+          <button onClick={() => navigate('/benchmark')} className="benchmark-button">
+            <span>📈</span>
+            Benchmark
+          </button>
           <button onClick={() => navigate('/security')} className="securitylab-button">
             <span>🧪</span>
             Segurança

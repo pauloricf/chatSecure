@@ -6,6 +6,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 import SecurityLab from './components/SecurityLab';
+import Benchmark from './components/Benchmark';
 import './App.css';
 
 // 🛡️ Componente de Rota Protegida
@@ -93,6 +94,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <SecurityLab />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/benchmark" 
+              element={
+                <ProtectedRoute>
+                  <Benchmark />
                 </ProtectedRoute>
               } 
             />
