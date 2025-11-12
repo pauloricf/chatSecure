@@ -1,6 +1,7 @@
 const forge = require('node-forge');
 const crypto = require('crypto');
 const CertificateManager = require('./certificateManager');
+const { prisma } = require('../database/prisma');
 
 class MessageSignature {
   
@@ -27,6 +28,91 @@ class MessageSignature {
     } catch (error) {
       console.error('Erro ao assinar mensagem:', error);
       throw new Error('Falha na assinatura da mensagem');
+    }
+  }
+
+  // Verificação versátil da mensagem:
+  // 1) verifyMessage(messageData, signature, contentHash, publicKeyPem) -> retorna detalhes
+  // 2) verifyMessage(content, signature, senderUserId) -> retorna boolean (fallback usado no WebSocket)
+  static async verifyMessage(arg1, signature, arg3, arg4) {
+    try {
+      // Caso completo com dados e hash conhecido
+      if (typeof arg1 === 'object' && typeof arg3 === 'string' && typeof arg4 === 'string') {
+        const messageData = arg1;
+        const contentHash = arg3;
+        const publicKeyPem = arg4;
+
+        const publicKey = forge.pki.publicKeyFromPem(publicKeyPem);
+        const signatureBytes = forge.util.decode64(signature);
+
+        // Verificar assinatura utilizando o hash fornecido
+        const md = forge.md.sha256.create();
+        md.update(contentHash, 'utf8');
+        const signatureValid = publicKey.verify(md.digest().bytes(), signatureBytes);
+
+        // Recalcular hash a partir dos dados para conferir integridade
+        const normalized = {
+          content: messageData.content,
+          sender: messageData.sender ?? messageData.senderId,
+          recipient: messageData.recipient ?? messageData.receiverId,
+          timestamp: messageData.timestamp
+        };
+        const recomputedHash = this.createMessageHash(normalized);
+        const hashValid = recomputedHash === contentHash;
+
+        return {
+          valid: signatureValid && hashValid,
+          signatureValid,
+          hashValid,
+          details: signatureValid
+            ? (hashValid ? 'Assinatura e hash válidos' : 'Assinatura válida, hash divergente')
+            : 'Assinatura inválida'
+        };
+      }
+
+      // Fallback simples usado pelo WebSocket: verificar assinatura baseada apenas no conteúdo
+      if (typeof arg1 === 'string' && typeof arg3 === 'string' && typeof arg4 === 'undefined') {
+        const content = arg1;
+        const senderUserId = arg3;
+
+        // Tentar obter chave pública via certificado ativo; se não houver, usar campo publicKey do usuário
+        const certificate = await prisma.certificate.findFirst({
+          where: {
+            userId: senderUserId,
+            isRevoked: false,
+            validTo: { gte: new Date() }
+          },
+          orderBy: { createdAt: 'desc' },
+          select: { publicKeyPem: true }
+        });
+
+        let keyPem = certificate?.publicKeyPem;
+        if (!keyPem) {
+          const user = await prisma.user.findUnique({
+            where: { id: senderUserId },
+            select: { publicKey: true }
+          });
+          keyPem = user?.publicKey || null;
+        }
+
+        if (!keyPem) {
+          return false;
+        }
+
+        const publicKey = forge.pki.publicKeyFromPem(keyPem);
+        const signatureBytes = forge.util.decode64(signature);
+
+        // Verificar assinatura baseada somente no conteúdo (compatibilidade legada)
+        const md = forge.md.sha256.create();
+        md.update(content, 'utf8');
+        return publicKey.verify(md.digest().bytes(), signatureBytes);
+      }
+
+      // Formato não reconhecido
+      return false;
+    } catch (error) {
+      console.error('Erro ao verificar mensagem:', error);
+      return false;
     }
   }
 

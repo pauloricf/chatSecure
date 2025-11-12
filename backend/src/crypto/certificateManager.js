@@ -120,10 +120,9 @@ class CertificateManager {
         privateKey: null, // Não temos a chave privada no servidor
       };
 
-      const certificateData = this.createSelfSignedCertificate(keyPair, userInfo);
-
-      // Retornar apenas os dados do certificado
-      return certificateData;
+      // Não é possível gerar um certificado autoassinado sem a chave privada correspondente.
+      // Opções corretas seriam assinar com uma CA interna (não implementado) ou o cliente gerar o certificado.
+      throw new Error('Não é possível gerar certificado autoassinado sem a chave privada do usuário');
     } catch (error) {
       console.error('Erro ao gerar certificado com chave pública:', error);
       throw new Error('Falha ao gerar certificado com chave pública fornecida');
@@ -268,7 +267,7 @@ class CertificateManager {
       await prisma.certificate.update({
         where: { serialNumber: serialNumber },
         data: {
-          revoked: true,
+          isRevoked: true,
           revokedAt: new Date(),
         },
       });

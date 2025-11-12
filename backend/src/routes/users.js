@@ -42,8 +42,8 @@ router.get('/', async (req, res) => {
       where: {
         AND: [
           { id: { not: req.user.id } }, // Excluir o próprio usuário
-          { isActive: true }
-        ]
+          { isActive: true },
+        ],
       },
       select: {
         id: true,
@@ -52,21 +52,20 @@ router.get('/', async (req, res) => {
         publicKey: true,
         isActive: true,
         lastSeen: true,
-        createdAt: true
+        createdAt: true,
       },
-      orderBy: { username: 'asc' }
+      orderBy: { username: 'asc' },
     });
 
     res.json({
       success: true,
-      users
+      users,
     });
-
   } catch (error) {
     console.error('Erro ao listar usuários:', error);
     res.status(500).json({
       success: false,
-      message: 'Erro interno do servidor'
+      message: 'Erro interno do servidor',
     });
   }
 });
@@ -120,16 +119,16 @@ router.get('/profile', async (req, res) => {
             subject: true,
             validFrom: true,
             validTo: true,
-            isRevoked: true
-          }
-        }
-      }
+            isRevoked: true,
+          },
+        },
+      },
     });
 
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'Usuário não encontrado'
+        message: 'Usuário não encontrado',
       });
     }
 
@@ -137,15 +136,14 @@ router.get('/profile', async (req, res) => {
       success: true,
       user: {
         ...user,
-        certificate: user.certificates[0] || null
-      }
+        certificate: user.certificates[0] || null,
+      },
     });
-
   } catch (error) {
     console.error('Erro ao buscar perfil:', error);
     res.status(500).json({
       success: false,
-      message: 'Erro interno do servidor'
+      message: 'Erro interno do servidor',
     });
   }
 });
@@ -183,7 +181,7 @@ router.get('/profile', async (req, res) => {
  *                     type: object
  *                     properties:
  *                       id:
- *                         type: integer
+ *                         type: string
  *                       username:
  *                         type: string
  *                       email:
@@ -204,7 +202,7 @@ router.get('/search', async (req, res) => {
     if (!q || q.length < 2) {
       return res.status(400).json({
         success: false,
-        message: 'Query deve ter pelo menos 2 caracteres'
+        message: 'Query deve ter pelo menos 2 caracteres',
       });
     }
 
@@ -217,10 +215,10 @@ router.get('/search', async (req, res) => {
             OR: [
               { username: { contains: q, mode: 'insensitive' } },
               { email: { contains: q, mode: 'insensitive' } },
-              { fullName: { contains: q, mode: 'insensitive' } }
-            ]
-          }
-        ]
+              { fullName: { contains: q, mode: 'insensitive' } },
+            ],
+          },
+        ],
       },
       select: {
         id: true,
@@ -228,22 +226,21 @@ router.get('/search', async (req, res) => {
         email: true,
         fullName: true,
         isActive: true,
-        lastAccess: true
+        lastAccess: true,
       },
       take: 20,
-      orderBy: { username: 'asc' }
+      orderBy: { username: 'asc' },
     });
 
-    res.json({ 
+    res.json({
       success: true,
-      users 
+      users,
     });
-
   } catch (error) {
     console.error('Erro na busca de usuários:', error);
     res.status(500).json({
       success: false,
-      message: 'Erro interno do servidor'
+      message: 'Erro interno do servidor',
     });
   }
 });
@@ -261,7 +258,7 @@ router.get('/search', async (req, res) => {
  *         name: userId
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *         description: ID do usuário
  *     responses:
  *       200:
@@ -281,7 +278,7 @@ router.get('/search', async (req, res) => {
  *                   type: object
  *                   properties:
  *                     id:
- *                       type: integer
+ *                       type: string
  *                     username:
  *                       type: string
  *                     fullName:
@@ -296,21 +293,21 @@ router.get('/:userId/public-key', async (req, res) => {
     const { userId } = req.params;
 
     const user = await prisma.user.findFirst({
-      where: { 
+      where: {
         id: userId,
-        isActive: true
+        isActive: true,
       },
       select: {
         id: true,
         username: true,
-        publicKey: true
-      }
+        publicKey: true,
+      },
     });
 
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'Usuário não encontrado'
+        message: 'Usuário não encontrado',
       });
     }
 
@@ -320,59 +317,47 @@ router.get('/:userId/public-key', async (req, res) => {
       user: {
         id: user.id,
         username: user.username,
-        fullName: user.fullName
-      }
+        fullName: user.fullName,
+      },
     });
 
     console.log('🔑 Debug - Retornando publicKey:', user.publicKey);
     console.log('🔑 Debug - Tipo:', typeof user.publicKey);
     console.log('🔑 Debug - Primeiros 100 chars:', user.publicKey?.substring(0, 100));
-
   } catch (error) {
     console.error('Erro ao buscar chave pública:', error);
     res.status(500).json({
       success: false,
-      message: 'Erro interno do servidor'
+      message: 'Erro interno do servidor',
     });
   }
 });
 
 // Verificar certificado de um usuário
 router.get('/:userId/certificate/verify', async (req, res) => {
-  const client = await pool.connect();
-  
   try {
     const { userId } = req.params;
 
-    const query = `
-      SELECT certificate
-      FROM users 
-      WHERE id = $1
-    `;
+    // Buscar o certificado mais recente do usuário
+    const certificate = await prisma.certificate.findFirst({
+      where: { userId, isRevoked: false },
+      orderBy: { createdAt: 'desc' },
+      select: { certificatePem: true },
+    });
 
-    const result = await client.query(query, [userId]);
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({
-        error: 'Usuário não encontrado'
-      });
+    if (!certificate) {
+      return res.status(404).json({ error: 'Certificado não encontrado' });
     }
 
-    const certificate = result.rows[0].certificate;
-    const verification = CertificateManager.verifyCertificate(certificate);
+    const verification = CertificateManager.verifyCertificate(certificate.certificatePem);
 
     res.json({
       userId,
-      verification
+      verification,
     });
-
   } catch (error) {
     console.error('Erro ao verificar certificado:', error);
-    res.status(500).json({
-      error: 'Erro interno do servidor'
-    });
-  } finally {
-    client.release();
+    res.status(500).json({ error: 'Erro interno do servidor' });
   }
 });
 
@@ -383,7 +368,7 @@ router.post('/certificate/regenerate', async (req, res) => {
 
     if (!password) {
       return res.status(400).json({
-        error: 'Password é obrigatório'
+        error: 'Password é obrigatório',
       });
     }
 
@@ -393,15 +378,15 @@ router.post('/certificate/regenerate', async (req, res) => {
       include: {
         certificates: {
           where: {
-            isRevoked: false
-          }
-        }
-      }
+            isRevoked: false,
+          },
+        },
+      },
     });
 
     if (!user) {
       return res.status(404).json({
-        error: 'Usuário não encontrado'
+        error: 'Usuário não encontrado',
       });
     }
 
@@ -411,7 +396,7 @@ router.post('/certificate/regenerate', async (req, res) => {
 
     if (!passwordMatch) {
       return res.status(401).json({
-        error: 'Senha incorreta'
+        error: 'Senha incorreta',
       });
     }
 
@@ -422,12 +407,12 @@ router.post('/certificate/regenerate', async (req, res) => {
         await tx.certificate.updateMany({
           where: {
             userId: req.user.id,
-            isRevoked: false
+            isRevoked: false,
           },
           data: {
             isRevoked: true,
-            revokedAt: new Date()
-          }
+            revokedAt: new Date(),
+          },
         });
       }
 
@@ -435,15 +420,15 @@ router.post('/certificate/regenerate', async (req, res) => {
       const certificateData = await CertificateManager.generateUserCertificate({
         username: user.username,
         email: user.email,
-        password
+        password,
       });
 
       // Atualizar chave pública do usuário
       await tx.user.update({
         where: { id: req.user.id },
         data: {
-          publicKey: certificateData.publicKey
-        }
+          publicKey: certificateData.publicKey,
+        },
       });
 
       // Criar novo certificado SEM chave privada
@@ -456,8 +441,8 @@ router.post('/certificate/regenerate', async (req, res) => {
           subject: certificateData.subject,
           issuer: certificateData.issuer,
           validFrom: new Date(certificateData.validFrom),
-          validTo: new Date(certificateData.validTo)
-        }
+          validTo: new Date(certificateData.validTo),
+        },
       });
 
       return { certificateData, newCertificate };
@@ -475,14 +460,13 @@ router.post('/certificate/regenerate', async (req, res) => {
         validFrom: result.newCertificate.validFrom,
         validTo: result.newCertificate.validTo,
         // Nova chave privada retornada apenas no response para o cliente armazenar
-        privateKey: result.certificateData.privateKey
-      }
+        privateKey: result.certificateData.privateKey,
+      },
     });
-
   } catch (error) {
     console.error('Erro ao regenerar certificado:', error);
     res.status(500).json({
-      error: 'Erro interno do servidor'
+      error: 'Erro interno do servidor',
     });
   }
 });

@@ -1,5 +1,6 @@
 // 🏠 DASHBOARD PRINCIPAL - INTERFACE DE MENSAGENS CRIPTOGRAFADAS
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { apiService } from '../services/apiService';
 import { cryptoService } from '../services/cryptoService';
@@ -8,6 +9,7 @@ import './Dashboard.css';
 
 const Dashboard = () => {
   const { user, logout, getPrivateKey } = useAuth();
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -478,6 +480,10 @@ const Dashboard = () => {
         </div>
 
         <div className="header-right">
+          <button onClick={() => navigate('/security')} className="securitylab-button">
+            <span>🧪</span>
+            Segurança
+          </button>
           <button onClick={handleLogout} className="logout-button">
             <span>🚪</span>
             Sair

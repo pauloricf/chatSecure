@@ -416,7 +416,7 @@ router.patch('/:certificateId/revoke', async (req, res) => {
  *                   type: object
  *                   properties:
  *                     id:
- *                       type: integer
+ *                       type: string
  *                     serialNumber:
  *                       type: string
  *                     subject:
@@ -512,7 +512,7 @@ router.get('/serial/:serialNumber', async (req, res) => {
  *                     type: object
  *                     properties:
  *                       id:
- *                         type: integer
+ *                         type: string
  *                       serialNumber:
  *                         type: string
  *                       subject:

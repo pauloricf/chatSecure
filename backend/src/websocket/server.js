@@ -232,10 +232,12 @@ class WebSocketServer {
       const message = await prisma.message.create({
         data: {
           senderId: messageData.senderId,
-          recipientId: messageData.recipientId,
+          receiverId: messageData.recipientId,
           content: messageData.content,
           signature: messageData.signature,
-          messageHash: messageData.messageHash
+          contentHash: messageData.messageHash,
+          signatureAlgorithm: 'SHA256withRSA',
+          hashAlgorithm: 'SHA-256'
         },
         select: {
           id: true,
@@ -287,11 +289,11 @@ class WebSocketServer {
         select: {
           id: true,
           senderId: true,
-          recipientId: true,
+          receiverId: true,
           content: true,
           signature: true,
-          messageHash: true,
-          sentAt: true,
+          contentHash: true,
+          createdAt: true,
           deliveredAt: true,
           readAt: true
         }
@@ -302,11 +304,11 @@ class WebSocketServer {
         return {
           id: message.id,
           sender_id: message.senderId,
-          recipient_id: message.recipientId,
+          recipient_id: message.receiverId,
           content: message.content,
           signature: message.signature,
-          message_hash: message.messageHash,
-          sent_at: message.sentAt,
+          message_hash: message.contentHash,
+          sent_at: message.createdAt,
           delivered_at: message.deliveredAt,
           read_at: message.readAt
         };

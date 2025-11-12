@@ -81,6 +81,8 @@ router.post('/', async (req, res) => {
         iv: iv,
         contentHash: messageHash,
         signature,
+        signatureAlgorithm: 'SHA256withRSA',
+        hashAlgorithm: 'SHA-256',
         senderId: req.user.id,
         receiverId: recipientId,
         isEncrypted: true,
@@ -172,7 +174,7 @@ router.post('/', async (req, res) => {
  *                   type: string
  *                   example: Mensagem enviada com sucesso
  *                 messageId:
- *                   type: integer
+ *                   type: string
  *                 sentAt:
  *                   type: string
  *                   format: date-time
@@ -187,7 +189,7 @@ router.post('/', async (req, res) => {
  */
 router.post('/send', async (req, res) => {
   try {
-    const { receiverId, content } = req.body;
+    const { receiverId, content, signature, messageHash } = req.body;
 
     // Validação básica
     if (!receiverId || !content) {
@@ -197,10 +199,18 @@ router.post('/send', async (req, res) => {
       });
     }
 
+    // Validar parâmetros de assinatura quando disponíveis
+    if (!signature || !messageHash) {
+      return res.status(400).json({
+        success: false,
+        message: 'signature e messageHash são obrigatórios'
+      });
+    }
+
     // Verificar se destinatário existe
-    const recipient = await prisma.user.findUnique({
+    const recipient = await prisma.user.findFirst({
       where: { 
-        id: parseInt(receiverId),
+        id: receiverId,
         isActive: true
       },
       select: {
@@ -234,28 +244,53 @@ router.post('/send', async (req, res) => {
       });
     }
 
-    // Gerar hash e assinatura da mensagem
-    const messageData = {
+    // Opcionalmente obter certificado do destinatário
+    const receiverCertificate = await prisma.certificate.findFirst({
+      where: {
+        userId: receiverId,
+        isRevoked: false,
+        validTo: { gte: new Date() }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    // Montar estrutura usada para verificação
+    const timestamp = new Date().toISOString();
+    const messageForVerification = {
       content,
-      senderId: req.user.id,
-      receiverId: parseInt(receiverId),
-      timestamp: new Date().toISOString()
+      sender: req.user.id,
+      recipient: receiverId,
+      timestamp,
+      signature,
+      messageHash
     };
 
-    const { hash, signature } = await MessageSignature.signMessage(
-      messageData,
-      senderCertificate.privateKeyPem
+    // Verificar assinatura e integridade da mensagem com a chave pública do certificado do remetente
+    const verification = await MessageSignature.verifyReceivedMessage(
+      messageForVerification,
+      senderCertificate.publicKeyPem
     );
+
+    if (!verification.overall) {
+      return res.status(400).json({
+        success: false,
+        message: 'Assinatura ou hash inválido',
+        details: verification.details
+      });
+    }
 
     // Salvar mensagem no banco
     const message = await prisma.message.create({
       data: {
         content,
-        contentHash: hash,
+        contentHash: messageHash,
         signature,
+        signatureAlgorithm: 'SHA256withRSA',
+        hashAlgorithm: 'SHA-256',
         senderId: req.user.id,
-        receiverId: parseInt(receiverId),
-        certificateId: senderCertificate.id,
+        receiverId: receiverId,
+        senderCertificateId: senderCertificate.id,
+        receiverCertificateId: receiverCertificate ? receiverCertificate.id : null,
         isRead: false
       },
       include: {
@@ -270,9 +305,9 @@ router.post('/send', async (req, res) => {
 
     // Verificar se destinatário está online e enviar via WebSocket
     let delivered = false;
-    if (wsServer && wsServer.isUserOnline(parseInt(receiverId))) {
+    if (wsServer && wsServer.isUserOnline(receiverId)) {
       try {
-        wsServer.sendToUser(parseInt(receiverId), 'new_message', {
+        wsServer.sendToUser(receiverId, 'new_message', {
           id: message.id,
           content: message.content,
           sender: message.sender,
@@ -521,7 +556,7 @@ router.get('/conversation/:userId', async (req, res) => {
           receiver: {
             select: { id: true, username: true, email: true }
           },
-          certificate: {
+          senderCertificate: {
             select: { id: true, serialNumber: true, subject: true }
           }
         },
@@ -585,7 +620,7 @@ router.get('/conversation/:userId', async (req, res) => {
  *         name: messageId
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *         description: ID da mensagem
  *     responses:
  *       200:
@@ -602,7 +637,7 @@ router.get('/conversation/:userId', async (req, res) => {
  *                   type: string
  *                   example: Mensagem marcada como lida
  *                 messageId:
- *                   type: integer
+ *                   type: string
  *                 readAt:
  *                   type: string
  *                   format: date-time
@@ -613,12 +648,12 @@ router.get('/conversation/:userId', async (req, res) => {
  */
 router.patch('/:messageId/read', async (req, res) => {
   try {
-    const { messageId } = req.params;
+  const { messageId } = req.params;
 
     // Verificar se a mensagem existe e o usuário é o destinatário
     const message = await prisma.message.findFirst({
       where: {
-        id: parseInt(messageId),
+        id: messageId,
         receiverId: req.user.id
       },
       select: {
@@ -648,7 +683,7 @@ router.patch('/:messageId/read', async (req, res) => {
 
     // Marcar como lida
     const updatedMessage = await prisma.message.update({
-      where: { id: parseInt(messageId) },
+      where: { id: messageId },
       data: {
         isRead: true,
         readAt: new Date()
@@ -700,7 +735,7 @@ router.patch('/:messageId/read', async (req, res) => {
  *         name: messageId
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *         description: ID da mensagem
  *     responses:
  *       200:
@@ -714,12 +749,12 @@ router.patch('/:messageId/read', async (req, res) => {
  *                   type: boolean
  *                   example: true
  *                 messageId:
- *                   type: integer
+ *                   type: string
  *                 sender:
  *                   type: object
  *                   properties:
  *                     id:
- *                       type: integer
+ *                       type: string
  *                     username:
  *                       type: string
  *                 verification:
@@ -745,7 +780,7 @@ router.get('/:messageId/verify', async (req, res) => {
     // Buscar mensagem e dados do remetente
     const message = await prisma.message.findFirst({
       where: {
-        id: parseInt(messageId),
+        id: messageId,
         OR: [
           { senderId: req.user.id },
           { receiverId: req.user.id }
@@ -755,11 +790,10 @@ router.get('/:messageId/verify', async (req, res) => {
         sender: {
           select: { id: true, username: true, publicKey: true }
         },
-        certificate: {
+        senderCertificate: {
           select: { 
             id: true, 
             publicKeyPem: true, 
-            privateKeyPem: true,
             serialNumber: true,
             subject: true
           }
@@ -786,7 +820,7 @@ router.get('/:messageId/verify', async (req, res) => {
       messageData,
       message.signature,
       message.contentHash,
-      message.certificate.publicKeyPem
+      message.senderCertificate?.publicKeyPem
     );
 
     res.json({

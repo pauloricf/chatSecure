@@ -1,0 +1,294 @@
+/* 🔬 Estilos do Laboratório de Segurança */
+
+.securitylab-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #0f0f0f;
+  color: #e4e4e7;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  overflow-x: hidden; /* evitar extrapolar horizontalmente */
+}
+
+.securitylab-header {
+  background: #18181b;
+  color: #e4e4e7;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #27272a;
+}
+
+.securitylab-header .logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.securitylab-header .logo-icon {
+  font-size: 1.5rem;
+}
+
+.securitylab-header .user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #27272a;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #3f3f46;
+}
+
+.securitylab-header .back-button {
+  background: #27272a;
+  color: #e4e4e7;
+  border: 1px solid #3f3f46;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.securitylab-header .back-button:hover {
+  background: #3f3f46;
+  border-color: #52525b;
+}
+
+.securitylab-content {
+  flex: 1;
+  padding: 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  box-sizing: border-box;
+  max-width: 100vw; /* impedir overflow horizontal */
+}
+
+.panel {
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.panel h2 {
+  margin-top: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.panel p {
+  color: #a1a1aa;
+  font-size: 0.875rem;
+}
+
+.form-row {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-row label {
+  font-size: 0.875rem;
+  color: #e4e4e7;
+}
+
+.form-row input,
+.form-row select,
+.form-row textarea {
+  background: #0f0f10;
+  color: #e4e4e7;
+  border: 1px solid #27272a;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+}
+
+.actions {
+  margin-top: 16px;
+}
+
+.run-button {
+  background: #3f3f46;
+  color: #f4f4f5;
+  border: 1px solid #52525b;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.run-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.status.error {
+  margin-top: 12px;
+  color: #ef4444;
+}
+
+.results {
+  margin-top: 20px;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.timeline-step {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #151517;
+  border: 1px solid #27272a;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.timeline-step .left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.timeline-step .badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #27272a;
+  border: 1px solid #3f3f46;
+  color: #e4e4e7;
+  font-weight: 600;
+}
+
+.timeline-step .title {
+  font-weight: 500;
+  color: #e4e4e7;
+  font-size: 0.9rem;
+}
+
+.timeline-step .principles {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  border: 1px solid #3f3f46;
+}
+
+.chip.confidencialidade,
+.chip.confidencialidade::first-letter { /* ensure lowercase mapping works */ }
+.chip.confidencialidade { background: #132b22; color: #a7f3d0; border-color: #1f9d64; }
+.chip.integridade { background: #2b1b13; color: #fed7aa; border-color: #f59e0b; }
+.chip.autenticidade { background: #1f2437; color: #bfdbfe; border-color: #3b82f6; }
+
+.timeline-step.active { border-color: #3b82f6; }
+.timeline-step.done { opacity: 0.9; }
+
+.markers {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.marker {
+  border: 1px solid #27272a;
+  border-radius: 10px;
+  padding: 12px;
+  background: #151517;
+}
+
+.marker-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.marker.ok {
+  border-color: #1f9d64;
+}
+.marker.fail {
+  border-color: #ef4444;
+}
+.marker .marker-label {
+  font-weight: 600;
+}
+.marker .marker-desc {
+  margin-top: 6px;
+  color: #a1a1aa;
+  font-size: 0.85rem;
+}
+
+.result-grid {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.result-item pre {
+  margin: 0;
+  background: #0f0f10;
+  border: 1px solid #27272a;
+  border-radius: 8px;
+  padding: 10px;
+  overflow: auto;
+  max-height: 180px;
+  white-space: pre-wrap; /* quebrar linhas longas */
+  word-break: break-word; /* garantir quebra em palavras grandes */
+  overflow-wrap: anywhere; /* forçar quebra em strings base64/PEM */
+  max-width: 100%;
+}
+
+.form-row textarea {
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.cert-table {
+  margin-top: 12px;
+  border: 1px solid #27272a;
+  border-radius: 8px;
+}
+.cert-row {
+  display: grid;
+  grid-template-columns: 2fr 2fr 2fr 1fr;
+  gap: 8px;
+  padding: 10px;
+}
+.cert-header {
+  background: #151517;
+  font-weight: 600;
+}
+.cert-empty {
+  padding: 12px;
+  color: #a1a1aa;
+}
+
+@media (max-width: 1024px) {
+  .securitylab-content {
+    grid-template-columns: 1fr;
+  }
+}

@@ -12,15 +12,15 @@ datasource db {
 }
 
 model User {
-  id          String   @id @default(cuid())
-  username    String   @unique
-  email       String   @unique
-  password    String
-  publicKey   String?  @map("public_key")
-  isActive    Boolean  @default(true) @map("is_active")
-  lastSeen    DateTime @default(now()) @map("last_seen")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id        String   @id @default(cuid())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  publicKey String?  @map("public_key")
+  isActive  Boolean  @default(true) @map("is_active")
+  lastSeen  DateTime @default(now()) @map("last_seen")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relacionamentos
   sentMessages     Message[]     @relation("SentMessages")
@@ -31,32 +31,32 @@ model User {
 }
 
 model Message {
-  id                String    @id @default(cuid())
-  content           String
-  encryptedKey      String?   @map("encrypted_key")
-  senderEncryptedKey String?  @map("sender_encrypted_key")
-  iv                String?
-  contentHash       String    @map("content_hash")
-  signature         String
-  signatureAlgorithm String   @map("signature_algorithm") // Ex: "RSA-PSS-SHA256"
-  hashAlgorithm      String   @map("hash_algorithm")      // Ex: "SHA-256"
-  isEncrypted       Boolean   @default(false) @map("is_encrypted")
-  isRead            Boolean   @default(false) @map("is_read")
-  readAt            DateTime? @map("read_at")
-  deliveredAt       DateTime? @map("delivered_at")
-  createdAt         DateTime  @default(now()) @map("created_at")
+  id                 String    @id @default(cuid())
+  content            String
+  encryptedKey       String?   @map("encrypted_key")
+  senderEncryptedKey String?   @map("sender_encrypted_key")
+  iv                 String?
+  contentHash        String    @map("content_hash")
+  signature          String
+  signatureAlgorithm String    @map("signature_algorithm") // Ex: "RSA-PSS-SHA256"
+  hashAlgorithm      String    @map("hash_algorithm") // Ex: "SHA-256"
+  isEncrypted        Boolean   @default(false) @map("is_encrypted")
+  isRead             Boolean   @default(false) @map("is_read")
+  readAt             DateTime? @map("read_at")
+  deliveredAt        DateTime? @map("delivered_at")
+  createdAt          DateTime  @default(now()) @map("created_at")
 
   // Relacionamentos principais
-  senderId          String    @map("sender_id")
-  receiverId        String    @map("receiver_id")
+  senderId   String @map("sender_id")
+  receiverId String @map("receiver_id")
 
   // Certificados
-  senderCertificateId   String?   @map("sender_certificate_id")
-  receiverCertificateId String?   @map("receiver_certificate_id")
+  senderCertificateId   String? @map("sender_certificate_id")
+  receiverCertificateId String? @map("receiver_certificate_id")
 
   // Relações com as tabelas
-  sender          User         @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
-  receiver        User         @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  sender              User         @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver            User         @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
   senderCertificate   Certificate? @relation("SenderCert", fields: [senderCertificateId], references: [id])
   receiverCertificate Certificate? @relation("ReceiverCert", fields: [receiverCertificateId], references: [id])
 
@@ -67,27 +67,27 @@ model Message {
   @@map("messages")
 }
 
-
 model Certificate {
-  id              String    @id @default(cuid())
-  serialNumber    String    @unique @map("serial_number")
-  publicKeyPem    String    @map("public_key_pem")
-  certificatePem  String    @map("certificate_pem")
-  subject         String
-  issuer          String
-  validFrom       DateTime  @map("valid_from")
-  validTo         DateTime  @map("valid_to")
-  isRevoked       Boolean   @default(false) @map("is_revoked")
-  revokedAt       DateTime? @map("revoked_at")
-  revocationReason String?  @map("revocation_reason")
-  createdAt       DateTime  @default(now()) @map("created_at")
-  
+  id               String    @id @default(cuid())
+  serialNumber     String    @unique @map("serial_number")
+  publicKeyPem     String    @map("public_key_pem")
+  certificatePem   String    @map("certificate_pem")
+  subject          String
+  issuer           String
+  validFrom        DateTime  @map("valid_from")
+  validTo          DateTime  @map("valid_to")
+  isRevoked        Boolean   @default(false) @map("is_revoked")
+  revokedAt        DateTime? @map("revoked_at")
+  revocationReason String?   @map("revocation_reason")
+  createdAt        DateTime  @default(now()) @map("created_at")
+
   // Foreign Key
-  userId          String    @map("user_id")
+  userId String @map("user_id")
 
   // Relacionamentos
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  messages        Message[]
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  senderMessages   Message[] @relation("SenderCert")
+  receiverMessages Message[] @relation("ReceiverCert")
 
   @@index([userId])
   @@index([serialNumber])
@@ -101,7 +101,7 @@ model Session {
   userId    String   @map("user_id")
   expiresAt DateTime @map("expires_at")
   createdAt DateTime @default(now()) @map("created_at")
-  
+
   @@index([token])
   @@index([userId])
   @@map("sessions")

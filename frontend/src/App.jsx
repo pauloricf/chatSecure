@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard';
+import SecurityLab from './components/SecurityLab';
 import './App.css';
 
 // 🛡️ Componente de Rota Protegida
@@ -84,6 +85,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/security" 
+              element={
+                <ProtectedRoute>
+                  <SecurityLab />
                 </ProtectedRoute>
               } 
             />
