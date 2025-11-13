@@ -8,7 +8,7 @@ import './SecurityLab.css';
 
 const SecurityLab = () => {
   const navigate = useNavigate();
-  const { user, getPrivateKey } = useAuth();
+  const { user, certificate, getPrivateKey } = useAuth();
 
   const [users, setUsers] = useState([]);
   const [recipientId, setRecipientId] = useState('');
@@ -24,26 +24,35 @@ const SecurityLab = () => {
     authenticity: 'pending',
   });
 
-  const [certificates, setCertificates] = useState([]);
   const [error, setError] = useState('');
+  const [userCertPem, setUserCertPem] = useState('');
+  const [messageValidity, setMessageValidity] = useState(null); // 'valid' | 'invalid' | null
 
   useEffect(() => {
-    // Carregar usuários e certificados para o painel
+    // Carregar usuários para o painel e preparar certificado local
     const init = async () => {
       try {
         const usersResp = await apiService.getUsers();
         const list = usersResp?.data?.users || usersResp?.users || [];
         setUsers(list);
-
-        const certResp = await apiService.getUserCertificates();
-        setCertificates(certResp?.certificates || certResp || []);
       } catch (err) {
         console.error('Erro ao carregar dados iniciais:', err);
-        setError('Falha ao carregar usuários/certificados.');
+        const msg = typeof err === 'object' && err?.message ? err.message : 'Falha ao carregar usuários.';
+        setError(`Falha ao carregar usuários: ${msg}`);
       }
     };
     init();
   }, []);
+
+  // Preparar conteúdo do certificado atual do usuário
+  useEffect(() => {
+    try {
+      const pem = certificate?.certificatePem || '';
+      setUserCertPem(pem);
+    } catch (e) {
+      // silencioso
+    }
+  }, [certificate]);
 
   const handleSelectRecipient = async (id) => {
     setRecipientId(id);
@@ -69,6 +78,7 @@ const SecurityLab = () => {
     setRunning(true);
     setResult(null);
     setMarkers({ confidentiality: 'pending', integrity: 'pending', authenticity: 'pending' });
+    setMessageValidity(null);
 
     try {
       if (!recipientId || !recipientPublicKey) {
@@ -106,6 +116,10 @@ const SecurityLab = () => {
       setMarkers((m) => ({ ...m, integrity: integrityOk ? 'ok' : 'fail' }));
       setCurrentStep(5);
 
+      // Resumo de validade da mensagem
+      const validity = (isSignatureValid && integrityOk) ? 'valid' : 'invalid';
+      setMessageValidity(validity);
+
     } catch (err) {
       console.error('Erro na simulação:', err);
       setError(err.message || 'Erro na simulação');
@@ -141,6 +155,28 @@ const SecurityLab = () => {
             </div>
           );
         })}
+      </div>
+    );
+  };
+
+  const KeyGenInfo = () => (
+    <div className="keygen-info">
+      <h3>🔑 Como sua chave é gerada</h3>
+      <ul>
+        <li>Par RSA 2048 bits é gerado no cliente.</li>
+        <li>Certificado X.509 autoassinado com SHA-256 é criado.</li>
+        <li>Chave privada é criptografada com PBKDF2 + AES-CBC usando sua senha.</li>
+        <li>Nenhuma chave privada vai para o servidor; apenas o certificado público.</li>
+      </ul>
+    </div>
+  );
+
+  const ValidityBadge = () => {
+    if (!messageValidity) return null;
+    const isValid = messageValidity === 'valid';
+    return (
+      <div className={`validity-badge ${isValid ? 'valid' : 'invalid'}`}>
+        {isValid ? '✅ Mensagem válida (assinatura e hash conferem)' : '❌ Mensagem inválida (falha em assinatura ou hash)'}
       </div>
     );
   };
@@ -188,6 +224,8 @@ const SecurityLab = () => {
           <h2>Simular Processo de Criptografia</h2>
           <p>Veja em qual etapa cada princípio é contemplado: confidencialidade, integridade e autenticidade.</p>
 
+          <KeyGenInfo />
+
           <div className="form-row">
             <label>Mensagem</label>
             <input
@@ -228,6 +266,7 @@ const SecurityLab = () => {
           {/* Marcadores dos princípios de segurança */}
           <div className="results">
             <StepTimeline step={currentStep} />
+            <ValidityBadge />
             <div className="markers">
                 <Marker
                   label="Confidencialidade"
@@ -269,28 +308,23 @@ const SecurityLab = () => {
         </section>
 
         <section className="panel">
-          <h2>Certificados do Usuário</h2>
-          <p>Visualize certificados ativos e seu status de revogação.</p>
-          <div className="cert-table">
-            <div className="cert-row cert-header">
-              <div>Serial</div>
-              <div>Emitido</div>
-              <div>Expira</div>
-              <div>Revogado</div>
+          <h2>Certificado enviado (Atual)</h2>
+          <p>Este é o certificado X.509 que foi enviado ao servidor no registro/login.</p>
+          {userCertPem ? (
+            <div className="cert-block">
+              <h3>📜 Conteúdo (PEM)</h3>
+              <pre>{userCertPem}</pre>
+              <div className="cert-meta">
+                <div><strong>Serial:</strong> {certificate?.serialNumber || '—'}</div>
+                <div><strong>Subject:</strong> {certificate?.subject || '—'}</div>
+                <div><strong>Issuer:</strong> {certificate?.issuer || '—'}</div>
+                <div><strong>Válido de:</strong> {certificate?.validFrom ? String(certificate.validFrom) : '—'}</div>
+                <div><strong>Válido até:</strong> {certificate?.validTo ? String(certificate.validTo) : '—'}</div>
+              </div>
             </div>
-            {Array.isArray(certificates) && certificates.length > 0 ? (
-              certificates.map((c) => (
-                <div className="cert-row" key={c.serialNumber || c.serial || Math.random()}>
-                  <div>{c.serialNumber || c.serial || '—'}</div>
-                  <div>{c.createdAt ? new Date(c.createdAt).toLocaleString('pt-BR') : '—'}</div>
-                  <div>{c.expiresAt ? new Date(c.expiresAt).toLocaleDateString('pt-BR') : c.validTo || '—'}</div>
-                  <div>{String(c.isRevoked ?? c.revoked ?? false)}</div>
-                </div>
-              ))
-            ) : (
-              <div className="cert-empty">Nenhum certificado encontrado.</div>
-            )}
-          </div>
+          ) : (
+            <div className="cert-empty">Certificado não encontrado no contexto. Faça login novamente.</div>
+          )}
         </section>
       </div>
     </div>

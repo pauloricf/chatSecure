@@ -139,6 +139,25 @@
   margin-top: 20px;
 }
 
+/* Badge de validade geral da mensagem */
+.validity-badge {
+  margin: 8px 0 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #27272a;
+  font-weight: 600;
+}
+.validity-badge.valid {
+  background: #0f1f17;
+  color: #a7f3d0;
+  border-color: #1f9d64;
+}
+.validity-badge.invalid {
+  background: #1f1414;
+  color: #fecaca;
+  border-color: #ef4444;
+}
+
 .timeline {
   display: flex;
   flex-direction: column;
@@ -218,6 +237,9 @@
   padding: 12px;
   background: #151517;
 }
+.marker .marker-icon {
+  font-size: 1rem;
+}
 
 .marker-top {
   display: flex;
@@ -267,10 +289,67 @@
   overflow-wrap: anywhere;
 }
 
+/* Painel com explicação da geração de chaves */
+.keygen-info {
+  margin-top: 12px;
+  border: 1px dashed #3f3f46;
+  border-radius: 10px;
+  padding: 12px;
+  background: #121214;
+}
+.keygen-info h3 {
+  margin: 0 0 8px 0;
+  font-size: 0.95rem;
+}
+.keygen-info ul {
+  margin: 0;
+  padding-left: 18px;
+  color: #a1a1aa;
+}
+.keygen-info li {
+  margin: 6px 0;
+}
+
 .cert-table {
   margin-top: 12px;
   border: 1px solid #27272a;
   border-radius: 8px;
+}
+.cert-block {
+  margin-top: 12px;
+  border: 1px solid #27272a;
+  border-radius: 10px;
+  padding: 12px;
+  background: #151517;
+}
+.cert-block h3 {
+  margin: 0 0 8px 0;
+  font-size: 0.95rem;
+}
+.cert-block pre {
+  margin: 0;
+  background: #0f0f10;
+  border: 1px solid #27272a;
+  border-radius: 8px;
+  padding: 10px;
+  overflow: auto;
+  max-height: 220px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+.cert-block .cert-meta {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.cert-block .cert-meta div {
+  background: #121214;
+  border: 1px solid #27272a;
+  border-radius: 8px;
+  padding: 8px;
 }
 .cert-row {
   display: grid;
