@@ -107,7 +107,7 @@ class ApiService {
     // IMPORTANTE: NÃO remover userCertificate - ele contém a chave privada criptografada
     // que precisa ser preservada para logins futuros
     // sessionStorage.removeItem('userCertificate');
-    console.log('🚪 Logout realizado - certificado preservado no sessionStorage');
+    console.log('🚪 Logout realizado - certificado preservado no localStorage');
   }
 
   // Verificar se está autenticado
@@ -123,7 +123,7 @@ class ApiService {
 
   // Obter certificado do usuário atual
   getCurrentUserCertificate() {
-    const certificate = sessionStorage.getItem('userCertificate');
+    const certificate = localStorage.getItem('userCertificate') || sessionStorage.getItem('userCertificate');
     return certificate ? JSON.parse(certificate) : null;
   }
 
@@ -212,6 +212,16 @@ class ApiService {
       return response;
     } catch (error) {
       console.error('❌ Erro ao obter usuários:', error);
+      throw this.handleError(error);
+    }
+  }
+
+  async regenerateCertificate(password) {
+    try {
+      const response = await this.api.post('/users/certificate/regenerate', { password });
+      return response.data;
+    } catch (error) {
+      console.error('❌ Erro ao regenerar certificado:', error);
       throw this.handleError(error);
     }
   }

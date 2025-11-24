@@ -367,20 +367,19 @@ const Dashboard = () => {
       console.log('🔑 Debug - publicKey valor:', selectedUser.publicKey);
       console.log('🔑 Debug - publicKey primeiros 100 chars:', selectedUser.publicKey?.substring(0, 100));
       
-      // Verificar se a publicKey está presente e obter dados completos se necessário
+      // Verificar se a publicKey está presente e obter via API se necessário
       let publicKeyToUse = selectedUser.publicKey;
-      
       if (!publicKeyToUse) {
-        console.error('❌ PublicKey não encontrada no selectedUser. Tentando buscar dados completos...');
-        
-        // Buscar dados completos do usuário na lista de usuários
-        const fullUserData = users.find(u => u.id === selectedUser.id);
-        
-        if (fullUserData && fullUserData.publicKey) {
-          console.log('✅ Dados completos encontrados, atualizando selectedUser...');
-          setSelectedUser(fullUserData);
-          publicKeyToUse = fullUserData.publicKey;
-        } else {
+        console.error('❌ PublicKey não encontrada no selectedUser. Buscando via API...');
+        try {
+          const resp = await apiService.getUserPublicKey(selectedUser.id);
+          publicKeyToUse = resp?.publicKey;
+          if (!publicKeyToUse) {
+            throw new Error('Chave pública do destinatário não encontrada na API');
+          }
+          console.log('✅ PublicKey obtida via API');
+        } catch (e) {
+          console.error('❌ Erro ao obter chave pública via API:', e);
           throw new Error('Chave pública do destinatário não encontrada. Recarregue a página e tente novamente.');
         }
       }
@@ -670,15 +669,6 @@ const Dashboard = () => {
                 <h2>Bem-vindo ao ChatSecure</h2>
                 <p>Selecione um usuário para iniciar uma conversa criptografada</p>
                 
-                <div className="security-features">
-                  <h3>🔐 Recursos de Segurança:</h3>
-                  <ul>
-                    <li>🔒 <strong>Criptografia Híbrida:</strong> AES-256 + RSA-2048</li>
-                    <li>✍️ <strong>Assinatura Digital:</strong> SHA256withRSA</li>
-                    <li>🛡️ <strong>End-to-End:</strong> Apenas você e o destinatário podem ler</li>
-                    <li>🔑 <strong>Chaves Temporárias:</strong> Nova chave para cada mensagem</li>
-                  </ul>
-                </div>
               </div>
             </div>
           )}

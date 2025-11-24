@@ -408,10 +408,11 @@
   background: #18181b;
 }
 
-.message-input-container {
+.input-container {
   display: flex;
   gap: 12px;
   align-items: flex-end;
+  
 }
 
 .message-input {

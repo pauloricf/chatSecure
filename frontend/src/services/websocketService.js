@@ -91,7 +91,7 @@ class WebSocketService {
     console.log(`🔄 Tentativa de reconexão ${this.reconnectAttempts}/${this.maxReconnectAttempts} em ${this.reconnectInterval}ms`);
     
     setTimeout(() => {
-      const token = sessionStorage.getItem('authToken');
+      const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
       if (token) {
         this.connect(token);
       }

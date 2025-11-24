@@ -1,5 +1,6 @@
 // 🔬 LABORATÓRIO DE SEGURANÇA
 import React, { useEffect, useState } from 'react';
+import forge from 'node-forge';
 import { useAuth } from '../context/AuthContext';
 import { apiService } from '../services/apiService';
 import { cryptoService } from '../services/cryptoService';
@@ -26,7 +27,8 @@ const SecurityLab = () => {
 
   const [error, setError] = useState('');
   const [userCertPem, setUserCertPem] = useState('');
-  const [messageValidity, setMessageValidity] = useState(null); // 'valid' | 'invalid' | null
+  const [messageValidity, setMessageValidity] = useState(null);
+  const [verificationNote, setVerificationNote] = useState('');
 
   useEffect(() => {
     // Carregar usuários para o painel e preparar certificado local
@@ -53,6 +55,15 @@ const SecurityLab = () => {
       // silencioso
     }
   }, [certificate]);
+
+  const extractPublicKeyFromCert = (certPem) => {
+    try {
+      const cert = forge.pki.certificateFromPem(certPem);
+      return forge.pki.publicKeyToPem(cert.publicKey);
+    } catch (_) {
+      return '';
+    }
+  };
 
   const handleSelectRecipient = async (id) => {
     setRecipientId(id);
@@ -100,14 +111,18 @@ const SecurityLab = () => {
       setMarkers((m) => ({ ...m, confidentiality: 'ok' }));
       setCurrentStep(3);
 
-      // Etapa 4: Assinatura (já retornada), verificar autenticidade localmente
-      const senderPublicKey = cryptoService.extractPublicKeyFromPrivateKey(privateKey);
+      const senderPublicKeyFromCert = extractPublicKeyFromCert(userCertPem);
       const isSignatureValid = await cryptoService.verifySignature(
         message,
         encryptedData.signature,
-        senderPublicKey
+        senderPublicKeyFromCert
       );
       setMarkers((m) => ({ ...m, authenticity: isSignatureValid ? 'ok' : 'fail' }));
+      setVerificationNote(
+        isSignatureValid
+          ? `Assinatura validada usando chave pública extraída do certificado X.509 do remetente${certificate?.subject ? ` (${certificate.subject})` : ''}.`
+          : 'Falha na verificação de assinatura com a chave pública do certificado do remetente.'
+      );
       setCurrentStep(4);
 
       // Etapa 5: Hash (integridade)
@@ -195,6 +210,15 @@ const SecurityLab = () => {
     );
   };
 
+  const DidacticNotes = () => (
+    <div className="didactic-notes">
+      <div className="note">Assinatura gerada sobre o texto original antes da criptografia.</div>
+      {verificationNote && (
+        <div className="note">{verificationNote}</div>
+      )}
+    </div>
+  );
+
   return (
     <div className="securitylab-container">
       <header className="securitylab-header">
@@ -267,6 +291,7 @@ const SecurityLab = () => {
           <div className="results">
             <StepTimeline step={currentStep} />
             <ValidityBadge />
+            <DidacticNotes />
             <div className="markers">
                 <Marker
                   label="Confidencialidade"
@@ -301,6 +326,17 @@ const SecurityLab = () => {
                 <div className="result-item">
                   <h3>🧮 Hash (SHA-256)</h3>
                   <pre>{String(result.messageHash)}</pre>
+                </div>
+                <div className="result-item">
+                  <h3>📦 Pacote final enviado</h3>
+                  <pre>{JSON.stringify({
+                    encryptedMessage: result.encryptedMessage,
+                    encryptedKey: result.encryptedKey,
+                    senderEncryptedKey: result.senderEncryptedKey,
+                    iv: result.iv,
+                    signature: result.signature,
+                    messageHash: result.messageHash
+                  }, null, 2)}</pre>
                 </div>
               </div>
             )}
